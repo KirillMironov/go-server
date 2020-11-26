@@ -17,5 +17,5 @@ func main() {
 	http.Handle("/", http.FileServer(http.Dir("C:/projects/web-app/web_app/build/web")))
 	http.HandleFunc("/register/", signUp)
 
-	log.Fatal(http.ListenAndServe(":9090", nil))
+	log.Fatal(http.ListenAndServe(":80", nil))
 }
