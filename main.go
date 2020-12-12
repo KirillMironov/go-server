@@ -14,8 +14,8 @@ func signUp(w http.ResponseWriter, r *http.Request) {
 func main() {
 	log.Println("Started")
 
-	http.Handle("/", http.FileServer(http.Dir("C:/projects/web-app/web_app/build/web")))
+	http.Handle("/", http.FileServer(http.Dir("../www/")))
 	http.HandleFunc("/register/", signUp)
 
-	log.Fatal(http.ListenAndServe(":80", nil))
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
