@@ -6,5 +6,10 @@ CREATE TABLE users
 	username character varying (16),
 	password character varying (64),
 	salt character varying (8),
-	email character varying (128)
+	email character varying (128),
+	UNIQUE(username)
 );
+
+INSERT INTO users (username, password, email) VALUES ('Bart', '123', 'asf@gmail.com');
+
+SELECT * FROM users;
