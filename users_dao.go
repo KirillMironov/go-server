@@ -11,10 +11,13 @@ type User struct {
 	Email    string
 }
 
-func insert(user *User, db *sql.DB) {
-	sql:= "INSERT INTO users (username, password, email) VALUES ($1, $2, $3)"
-	_, err := db.Exec(sql, user.Username, user.Password, user.Email)
+func insert(user *User, tx *sql.Tx) error {
+	sqlStr := "INSERT INTO users (username, password, email) VALUES ($1, $2, $3)"
+
+	_, err := tx.Exec(sqlStr, user.Username, user.Password, user.Email)
 	if err != nil {
-		panic(err)
+		return err
 	}
+
+	return nil
 }
