@@ -6,12 +6,10 @@ import (
 	"net/http"
 )
 
-const (
-	connectionString = "postgres://postgres:postgres@35.210.228.180:5432/postgres"
-)
+var conf Conf
 
 func insertInTx(user *User) {
-	db, err := sql.Open("postgres", connectionString)
+	db, err := sql.Open("postgres", conf.Database.ConnectionString)
 	if err != nil {
 		log.Printf("Unable to open connection")
 	}
@@ -44,6 +42,8 @@ func signUp(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	ReadConfiguration("service.yaml", &conf)
+
 	log.Println("Started")
 
 	http.Handle("/", http.FileServer(http.Dir("../www/")))
