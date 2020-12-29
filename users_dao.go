@@ -1,14 +1,18 @@
 package main
 
 import (
+	"container/list"
 	"database/sql"
 	_ "github.com/lib/pq"
+	"log"
 )
 
 type User struct {
+	Id int64
 	Username string
 	Password string
-	Email    string
+	Salt string
+	Email string
 }
 
 func insert(user *User, tx *sql.Tx) error {
@@ -20,4 +24,28 @@ func insert(user *User, tx *sql.Tx) error {
 	}
 
 	return nil
+}
+
+func findByEmailAndPassword(email string, password string, tx *sql.Tx) (*list.List, error) {
+	sqlStr := "SELECT * FROM users WHERE email = $1 AND password = $2"
+
+	rows, err := tx.Query(sqlStr, email, password)
+	if err != nil {
+		log.Printf("Unable to find user")
+	}
+	defer rows.Close()
+
+	users := list.New()
+
+	for rows.Next() {
+		var user User
+
+		if err := rows.Scan(&user.Id, &user.Username, &user.Password, &user.Salt, &user.Email); err != nil {
+			log.Printf("%v", err)
+		}
+
+		users.PushBack(user)
+	}
+
+	return users, nil
 }

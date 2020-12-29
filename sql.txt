@@ -12,4 +12,6 @@ CREATE TABLE users
 
 INSERT INTO users (username, password, email) VALUES ('Bart', '123', 'asf@gmail.com');
 
+SELECT EXISTS(SELECT * FROM users WHERE email = $1 AND password = $2)
+
 SELECT * FROM users;
