@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"testing"
 )
 
@@ -51,11 +50,9 @@ func TestFindUserByEmailAndPassword(t *testing.T) {
 	}
 
 	users, err := findByEmailAndPassword("maggie@gmail.com", "125", tx)
-	if err != nil {
+	if err != nil || users.Len() == 0 {
 		t.Fatal("Unable to find user")
 	}
-
-	fmt.Printf("Size = %d", users.Len())
 
 	//Rollback tx
 	rollbackErr := tx.Rollback()

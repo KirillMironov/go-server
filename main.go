@@ -62,7 +62,6 @@ func signUp(w http.ResponseWriter, r *http.Request) {
 func signIn(w http.ResponseWriter, r *http.Request) {
 	email := r.URL.Query().Get("email")
 	password := r.URL.Query().Get("password")
-	log.Println(email, password)
 
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
@@ -72,6 +71,7 @@ func signIn(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Success sign in")
 		w.WriteHeader(http.StatusOK)
 	} else {
+		log.Printf("Wrong email or password")
 		w.WriteHeader(http.StatusNoContent)
 	}
 }
