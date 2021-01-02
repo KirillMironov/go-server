@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestRead(t *testing.T)  {
+func TestReadConfiguration(t *testing.T)  {
 	var conf Conf
 	ReadConfiguration("service.yaml", &conf)
 

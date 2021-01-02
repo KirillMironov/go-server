@@ -22,12 +22,12 @@ func TestInsertUser(t *testing.T) {
 
 	err = insert(user, tx)
 	if err != nil {
-		t.Fatal("Unable to insert")
+		t.Fatal("Unable to insert user")
 	}
 
 	err = insert(user2, tx)
 	if err != nil {
-		t.Fatal("Unable to insert")
+		t.Fatal("Unable to insert user")
 	}
 
 	//Rollback tx

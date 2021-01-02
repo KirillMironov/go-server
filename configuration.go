@@ -20,6 +20,6 @@ func ReadConfiguration(filename string, conf *Conf) {
 
 	err = yaml.Unmarshal(file, conf)
 	if err != nil {
-		log.Printf("Unmarshal error")
+		log.Printf("%v", err)
 	}
 }

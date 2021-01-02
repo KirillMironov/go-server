@@ -31,7 +31,7 @@ func findByEmailAndPassword(email string, password string, tx *sql.Tx) (*list.Li
 
 	rows, err := tx.Query(sqlStr, email, password)
 	if err != nil {
-		log.Printf("Unable to find user")
+		log.Printf("%v", err)
 	}
 	defer rows.Close()
 

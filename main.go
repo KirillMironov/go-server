@@ -11,19 +11,20 @@ var conf Conf
 func insertInTx(user *User) {
 	db, err := sql.Open("postgres", conf.Database.ConnectionString)
 	if err != nil {
-		log.Printf("Unable to open connection")
+		log.Printf("%v", err)
 	}
 
 	tx, err := db.Begin()
 	if err != nil || tx == nil {
-		log.Printf("Unable to begin transaction")
+		log.Printf("%v", err)
 	}
 
 	err = insert(user, tx)
 	if err != nil {
-		log.Printf("Unable to insert User")
+		log.Printf("%v", err)
 		err = tx.Rollback()
 	} else {
+		log.Printf("User inserted")
 		err = tx.Commit()
 	}
 }
@@ -31,17 +32,17 @@ func insertInTx(user *User) {
 func findUser(user *User) bool {
 	db, err := sql.Open("postgres", conf.Database.ConnectionString)
 	if err != nil {
-		log.Printf("Unable to open connection")
+		log.Printf("%v", err)
 	}
 
 	tx, err := db.Begin()
 	if err != nil || tx == nil {
-		log.Printf("Unable to begin transaction")
+		log.Printf("%v", err)
 	}
 
 	users, err := findByEmailAndPassword(user.Email, user.Password, tx)
 	if err != nil {
-		log.Printf("Unable to find user")
+		log.Printf("%v", err)
 		err = tx.Rollback()
 	} else {
 		err = tx.Commit()
