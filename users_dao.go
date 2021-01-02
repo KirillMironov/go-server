@@ -16,9 +16,9 @@ type User struct {
 }
 
 func insert(user *User, tx *sql.Tx) error {
-	sqlStr := "INSERT INTO users (username, password, email) VALUES ($1, $2, $3)"
+	sqlStr := "INSERT INTO users (username, password, salt, email) VALUES ($1, $2, $3, $4)"
 
-	_, err := tx.Exec(sqlStr, user.Username, user.Password, user.Email)
+	_, err := tx.Exec(sqlStr, user.Username, user.Password, user.Salt, user.Email)
 	if err != nil {
 		return err
 	}
@@ -27,9 +27,9 @@ func insert(user *User, tx *sql.Tx) error {
 }
 
 func findByEmailAndPassword(email string, password string, tx *sql.Tx) (*list.List, error) {
-	sqlStr := "SELECT * FROM users WHERE email = $1 AND password = $2"
+	sqlStr := "SELECT * FROM users WHERE email = $1"
 
-	rows, err := tx.Query(sqlStr, email, password)
+	rows, err := tx.Query(sqlStr, email)
 	if err != nil {
 		log.Printf("%v", err)
 	}
@@ -40,11 +40,14 @@ func findByEmailAndPassword(email string, password string, tx *sql.Tx) (*list.Li
 	for rows.Next() {
 		var user User
 
-		if err := rows.Scan(&user.Id, &user.Username, &user.Password, &user.Salt, &user.Email); err != nil {
+		err := rows.Scan(&user.Id, &user.Username, &user.Password, &user.Salt, &user.Email)
+		if err != nil {
 			log.Printf("%v", err)
 		}
 
-		users.PushBack(user)
+		if user.Password == hash(password + user.Salt) {
+			users.PushBack(user)
+		}
 	}
 
 	return users, nil

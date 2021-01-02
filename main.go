@@ -54,9 +54,10 @@ func findUser(user *User) bool {
 func signUp(w http.ResponseWriter, r *http.Request) {
 	email := r.URL.Query().Get("email")
 	password := r.URL.Query().Get("password")
-	log.Println(email, password)
 
-	user := &User{0, email, password, "", email}
+	password, salt := generateHashAndSalt(password)
+
+	user := &User{0, email, password, salt, email}
 	insertInTx(user)
 }
 

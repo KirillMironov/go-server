@@ -49,7 +49,7 @@ func TestFindUserByEmailAndPassword(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	users, err := findByEmailAndPassword("maggie@gmail.com", "125", tx)
+	users, err := findByEmailAndPassword("Homer", "125", tx)
 	if err != nil || users.Len() == 0 {
 		t.Fatal("Unable to find user")
 	}
