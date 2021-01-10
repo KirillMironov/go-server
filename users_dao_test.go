@@ -60,3 +60,10 @@ func TestFindUserByEmailAndPassword(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestCreateToken(t *testing.T) {
+	token, err := createToken("Homer")
+	if err != nil || len(token) == 0 {
+		t.Fatal(err)
+	}
+}

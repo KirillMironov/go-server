@@ -3,9 +3,13 @@ package main
 import (
 	"container/list"
 	"database/sql"
+	"github.com/dgrijalva/jwt-go"
 	_ "github.com/lib/pq"
 	"log"
+	"time"
 )
+
+var jwtKey = []byte("fijASF!saf=342afAS")
 
 type User struct {
 	Id int64
@@ -13,6 +17,11 @@ type User struct {
 	Password string
 	Salt string
 	Email string
+}
+
+type Claims struct {
+	Username string
+	jwt.StandardClaims
 }
 
 func insert(user *User, tx *sql.Tx) error {
@@ -51,4 +60,22 @@ func findByEmailAndPassword(email string, password string, tx *sql.Tx) (*list.Li
 	}
 
 	return users, nil
+}
+
+func createToken(username string) (string, error) {
+	claims := &Claims{
+		Username: username,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(jwtKey)
+	if err != nil {
+		log.Printf("Unable to create token")
+		return "", err
+	}
+
+	return tokenString, nil
 }

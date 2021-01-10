@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"time"
 )
 
 var conf Conf
@@ -51,6 +52,18 @@ func findUser(user *User) bool {
 	return users.Len() > 0
 }
 
+func setTokenInCookies(username string, w http.ResponseWriter) {
+	expiration := time.Now().Add(24 * time.Hour)
+	token, _ := createToken(username)
+	cookie := http.Cookie{
+		Name: "jwt",
+		Value: token,
+		Path: "/",
+		Expires: expiration,
+	}
+	http.SetCookie(w, &cookie)
+}
+
 func signUp(w http.ResponseWriter, r *http.Request) {
 	email := r.URL.Query().Get("email")
 	password := r.URL.Query().Get("password")
@@ -59,6 +72,7 @@ func signUp(w http.ResponseWriter, r *http.Request) {
 
 	user := &User{0, email, password, salt, email}
 	insertInTx(user)
+	setTokenInCookies(user.Username, w)
 }
 
 func signIn(w http.ResponseWriter, r *http.Request) {
@@ -70,6 +84,7 @@ func signIn(w http.ResponseWriter, r *http.Request) {
 
 	user := &User{0, email, password, "", email}
 	if findUser(user) {
+		setTokenInCookies(user.Username, w)
 		log.Printf("Success sign in")
 		w.WriteHeader(http.StatusOK)
 	} else {
