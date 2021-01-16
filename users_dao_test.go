@@ -62,7 +62,9 @@ func TestFindUserByEmailAndPassword(t *testing.T) {
 }
 
 func TestCreateToken(t *testing.T) {
-	token, err := createToken("Homer")
+	user := &User{0, "Homer", "666", "", "homer@gmail.com"}
+
+	token, err := createToken(user)
 	if err != nil || len(token) == 0 {
 		t.Fatal(err)
 	}

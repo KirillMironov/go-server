@@ -21,6 +21,7 @@ type User struct {
 
 type Claims struct {
 	Username string
+	Id int64
 	jwt.StandardClaims
 }
 
@@ -62,11 +63,12 @@ func findByEmailAndPassword(email string, password string, tx *sql.Tx) (*list.Li
 	return users, nil
 }
 
-func createToken(username string) (string, error) {
+func createToken(user *User) (string, error) {
 	claims := &Claims{
-		Username: username,
+		Username: user.Username,
+		Id: user.Id,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
+			ExpiresAt: time.Now().Add(time.Hour).Unix(),
 		},
 	}
 
@@ -78,4 +80,17 @@ func createToken(username string) (string, error) {
 	}
 
 	return tokenString, nil
+}
+
+func verifyToken(token string) (bool, string) {
+	claims := &Claims{}
+
+	tkn, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
+	})
+	if err != nil {
+		log.Printf("%v", err)
+	}
+
+	return tkn.Valid, claims.Username
 }
