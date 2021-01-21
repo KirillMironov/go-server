@@ -2,15 +2,14 @@ package main
 
 import (
 	"database/sql"
+	"github.com/KirillMironov/go-server/cmd/go-server/config"
 	"log"
 	"net/http"
 	"time"
 )
 
-var conf Conf
-
 func insertInTx(user *User) {
-	db, err := sql.Open("postgres", conf.Database.ConnectionString)
+	db, err := sql.Open("postgres", config.Config.Database.ConnectionString)
 	if err != nil {
 		log.Printf("%v", err)
 	}
@@ -31,7 +30,7 @@ func insertInTx(user *User) {
 }
 
 func findUser(user *User) bool {
-	db, err := sql.Open("postgres", conf.Database.ConnectionString)
+	db, err := sql.Open("postgres", config.Config.Database.ConnectionString)
 	if err != nil {
 		log.Printf("%v", err)
 	}
@@ -112,7 +111,10 @@ func home(w http.ResponseWriter, r *http.Request)  {
 }
 
 func main() {
-	ReadConfiguration("service.yaml", &conf)
+	err := config.ReadConfig()
+	if err != nil {
+		log.Printf("%v", err)
+	}
 
 	log.Println("Started")
 
