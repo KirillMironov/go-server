@@ -3,9 +3,19 @@ package main
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"github.com/dgrijalva/jwt-go"
+	"log"
 	"math/rand"
 	"time"
 )
+
+var jwtKey = []byte("fijASF!saf=342afAS")
+
+type Claims struct {
+	Username string
+	Id int64
+	jwt.StandardClaims
+}
 
 func hash(s string) string {
 	bytes := []byte(s)
@@ -24,3 +34,36 @@ func generateHashAndSalt(password string) (string, string) {
 
 	return hash(password + string(salt)), string(salt)
 }
+
+func createToken(user *User) (string, error) {
+	claims := &Claims{
+		Username: user.Username,
+		Id: user.Id,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour).Unix(),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(jwtKey)
+	if err != nil {
+		log.Printf("Unable to create token")
+		return "", err
+	}
+
+	return tokenString, nil
+}
+
+func verifyToken(token string) (bool, string) {
+	claims := &Claims{}
+
+	tkn, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
+	})
+	if err != nil {
+		log.Printf("%v", err)
+	}
+
+	return tkn.Valid, claims.Username
+}
+

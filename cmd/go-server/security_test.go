@@ -18,3 +18,12 @@ func TestHash(t *testing.T)  {
 		t.Fatal("Hashing error")
 	}
 }
+
+func TestCreateToken(t *testing.T) {
+	user := &User{0, "Homer", "666", "", "homer@gmail.com"}
+
+	token, err := createToken(user)
+	if err != nil || len(token) == 0 {
+		t.Fatal(err)
+	}
+}

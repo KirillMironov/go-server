@@ -19,7 +19,7 @@ func insertInTx(user *User) {
 		log.Printf("%v", err)
 	}
 
-	err = insert(user, tx)
+	err = insertUser(user, tx)
 	if err != nil {
 		log.Printf("%v", err)
 		err = tx.Rollback()
@@ -35,20 +35,12 @@ func findUser(user *User) bool {
 		log.Printf("%v", err)
 	}
 
-	tx, err := db.Begin()
-	if err != nil || tx == nil {
-		log.Printf("%v", err)
-	}
-
-	users, err := findByEmailAndPassword(user.Email, user.Password, tx)
+	_, err = findUserByEmailAndPassword(user.Email, user.Password, db)
 	if err != nil {
 		log.Printf("%v", err)
-		err = tx.Rollback()
-	} else {
-		err = tx.Commit()
+		return false
 	}
-
-	return users.Len() > 0
+	return true
 }
 
 func setTokenInCookies(user *User, w http.ResponseWriter) {
