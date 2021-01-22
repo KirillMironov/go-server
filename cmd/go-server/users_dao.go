@@ -1,7 +1,9 @@
 package main
 
 import (
+	"crypto/sha256"
 	"database/sql"
+	"encoding/hex"
 	_ "github.com/lib/pq"
 	"log"
 )
@@ -40,7 +42,9 @@ func findUserByEmailAndPassword(email string, password string, db *sql.DB) (int6
 			log.Printf("%v", err)
 		}
 
-		if user.Password == hash(password + user.Salt) {
+		hash := sha256.Sum256([]byte(password + user.Salt))
+
+		if user.Password == hex.EncodeToString(hash[:]) {
 			rows.Close()
 			return user.Id, nil
 		}

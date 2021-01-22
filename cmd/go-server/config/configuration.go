@@ -8,8 +8,11 @@ var Config DBConfig
 
 type DBConfig struct {
 	Database struct {
-		ConnectionString string `yaml:"ConnectionString"`
-	} `yaml:"Database"`
+		ConnectionString string
+	}
+	Security struct {
+		JWTKey string
+	}
 }
 
 func ReadConfig() error {

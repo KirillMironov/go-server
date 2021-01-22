@@ -3,24 +3,17 @@ package main
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"github.com/KirillMironov/go-server/cmd/go-server/config"
 	"github.com/dgrijalva/jwt-go"
 	"log"
 	"math/rand"
 	"time"
 )
 
-var jwtKey = []byte("fijASF!saf=342afAS")
-
 type Claims struct {
 	Username string
 	Id int64
 	jwt.StandardClaims
-}
-
-func hash(s string) string {
-	bytes := []byte(s)
-	hash := sha256.Sum256(bytes)
-	return hex.EncodeToString(hash[:])
 }
 
 func generateHashAndSalt(password string) (string, string) {
@@ -32,7 +25,9 @@ func generateHashAndSalt(password string) (string, string) {
 		salt[i] = letters[rand.Intn(len(letters))]
 	}
 
-	return hash(password + string(salt)), string(salt)
+	hash := sha256.Sum256([]byte(password))
+
+	return hex.EncodeToString(hash[:]), string(salt)
 }
 
 func createToken(user *User) (string, error) {
@@ -45,7 +40,8 @@ func createToken(user *User) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(jwtKey)
+
+	tokenString, err := token.SignedString([]byte(config.Config.Security.JWTKey))
 	if err != nil {
 		log.Printf("Unable to create token")
 		return "", err
@@ -54,16 +50,16 @@ func createToken(user *User) (string, error) {
 	return tokenString, nil
 }
 
-func verifyToken(token string) (bool, string) {
+func verifyToken(token string) (bool, int64) {
 	claims := &Claims{}
 
 	tkn, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
-		return jwtKey, nil
+		return []byte(config.Config.Security.JWTKey), nil
 	})
 	if err != nil {
 		log.Printf("%v", err)
 	}
 
-	return tkn.Valid, claims.Username
+	return tkn.Valid, claims.Id
 }
 

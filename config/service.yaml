@@ -1,2 +1,4 @@
 Database:
   ConnectionString: postgres://postgres:postgres@35.210.228.180:5432/postgres
+Security:
+  JWTKey: fijASF!saf=342afAS

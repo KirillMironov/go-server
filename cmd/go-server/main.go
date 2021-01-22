@@ -92,10 +92,10 @@ func home(w http.ResponseWriter, r *http.Request)  {
 		log.Printf("%v", err)
 	}
 
-	isValid, username := verifyToken(token.Value)
+	isValid, id := verifyToken(token.Value)
 
 	if isValid {
-		_, err = w.Write([]byte(username))
+		_, err = w.Write(make([]byte, id))
 		if err != nil {
 			log.Printf("%v", err)
 		}
@@ -108,7 +108,7 @@ func main() {
 		log.Printf("%v", err)
 	}
 
-	log.Println("Started")
+	log.Printf("Started")
 
 	http.Handle("/", http.FileServer(http.Dir("../www/")))
 	http.HandleFunc("/register/", signUp)
