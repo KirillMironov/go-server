@@ -20,12 +20,12 @@ func TestInsertUser(t *testing.T) {
 	user := &User{0, "Flanders", "666", "", "flanders@gmail.com"}
 	user2 := &User{0, "Marge", "122", "", "marge@gmail.com"}
 
-	err = insertUser(user, tx)
+	_, err = insertUser(user, tx)
 	if err != nil {
 		t.Fatal("Unable to insert user")
 	}
 
-	err = insertUser(user2, tx)
+	_, err = insertUser(user2, tx)
 	if err != nil {
 		t.Fatal("Unable to insert user")
 	}

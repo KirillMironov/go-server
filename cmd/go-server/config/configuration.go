@@ -20,6 +20,7 @@ func ReadConfig() error {
 	v.SetConfigName("service")
 	v.SetConfigType("yaml")
 	v.AddConfigPath("../../../config")
+	v.AddConfigPath("../../config")
 	v.SetEnvPrefix("go-server")
 	v.AutomaticEnv()
 	if err := v.ReadInConfig(); err != nil {

@@ -19,7 +19,7 @@ func insertInTx(user *User) {
 		log.Printf("%v", err)
 	}
 
-	err = insertUser(user, tx)
+	user.Id, err = insertUser(user, tx)
 	if err != nil {
 		log.Printf("%v", err)
 		err = tx.Rollback()
@@ -35,9 +35,8 @@ func findUser(user *User) bool {
 		log.Printf("%v", err)
 	}
 
-	_, err = findUserByEmailAndPassword(user.Email, user.Password, db)
+	user.Id, err = findUserByEmailAndPassword(user.Email, user.Password, db)
 	if err != nil {
-		log.Printf("%v", err)
 		return false
 	}
 	return true
@@ -61,9 +60,9 @@ func signUp(w http.ResponseWriter, r *http.Request) {
 
 	password, salt := generateHashAndSalt(password)
 
-	user := &User{0, email, password, salt, email}
-	insertInTx(user)
-	setTokenInCookies(user, w)
+	user := User{0, email, password, salt, email}
+	insertInTx(&user)
+	setTokenInCookies(&user, w)
 }
 
 func signIn(w http.ResponseWriter, r *http.Request) {
@@ -73,9 +72,9 @@ func signIn(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
-	user := &User{0, email, password, "", email}
-	if findUser(user) {
-		setTokenInCookies(user, w)
+	user := User{0, email, password, "", email}
+	if findUser(&user) {
+		setTokenInCookies(&user, w)
 		log.Printf("Success sign in")
 	} else {
 		log.Printf("Wrong email or password")
@@ -110,7 +109,7 @@ func main() {
 
 	log.Printf("Started")
 
-	http.Handle("/", http.FileServer(http.Dir("../www/")))
+	http.Handle("/", http.FileServer(http.Dir("../../../www/")))
 	http.HandleFunc("/register/", signUp)
 	http.HandleFunc("/login/", signIn)
 	http.HandleFunc("/home/", home)

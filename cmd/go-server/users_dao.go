@@ -16,14 +16,15 @@ type User struct {
 	Email string
 }
 
-func insertUser(user *User, tx *sql.Tx) error {
-	sqlStr := "INSERT INTO users (username, password, salt, email) VALUES ($1, $2, $3, $4)"
+func insertUser(user *User, tx *sql.Tx) (int64, error) {
+	sqlStr := "INSERT INTO users (username, password, salt, email) VALUES ($1, $2, $3, $4) RETURNING id"
+	var id int64
 
-	_, err := tx.Exec(sqlStr, user.Username, user.Password, user.Salt, user.Email)
+	err := tx.QueryRow(sqlStr, user.Username, user.Password, user.Salt, user.Email).Scan(&id)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+	return id, nil
 }
 
 func findUserByEmailAndPassword(email string, password string, db *sql.DB) (int64, error) {
@@ -49,7 +50,6 @@ func findUserByEmailAndPassword(email string, password string, db *sql.DB) (int6
 			return user.Id, nil
 		}
 	}
-
 	return 0, sql.ErrNoRows
 }
 
