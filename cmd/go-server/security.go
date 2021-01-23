@@ -25,7 +25,7 @@ func generateHashAndSalt(password string) (string, string) {
 		salt[i] = letters[rand.Intn(len(letters))]
 	}
 
-	hash := sha256.Sum256([]byte(password))
+	hash := sha256.Sum256([]byte(password + string(salt)))
 
 	return hex.EncodeToString(hash[:]), string(salt)
 }

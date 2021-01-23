@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/KirillMironov/go-server/cmd/go-server/config"
 	"log"
 	"net/http"
@@ -94,7 +95,7 @@ func home(w http.ResponseWriter, r *http.Request)  {
 	isValid, id := verifyToken(token.Value)
 
 	if isValid {
-		_, err = w.Write(make([]byte, id))
+		_, err = fmt.Fprintf(w, "%v", id)
 		if err != nil {
 			log.Printf("%v", err)
 		}
