@@ -55,6 +55,24 @@ func setTokenInCookies(user *User, w http.ResponseWriter) {
 	http.SetCookie(w, &cookie)
 }
 
+func auth(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+	token, err := r.Cookie("jwt")
+	if err != nil {
+		log.Printf("%v", err)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	isValid, _ := verifyToken(token.Value)
+
+	if !isValid {
+		w.WriteHeader(http.StatusUnauthorized)
+	}
+}
+
 func signUp(w http.ResponseWriter, r *http.Request) {
 	email := r.URL.Query().Get("email")
 	password := r.URL.Query().Get("password")
@@ -111,6 +129,7 @@ func main() {
 	log.Printf("Started")
 
 	http.Handle("/", http.FileServer(http.Dir("../../../www/")))
+	http.HandleFunc("/auth/", auth)
 	http.HandleFunc("/register/", signUp)
 	http.HandleFunc("/login/", signIn)
 	http.HandleFunc("/home/", home)
