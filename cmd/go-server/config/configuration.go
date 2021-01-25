@@ -23,7 +23,9 @@ func ReadConfig() error {
 	v.AddConfigPath("../../config")
 	v.SetEnvPrefix("go-server")
 	v.AutomaticEnv()
-	if err := v.ReadInConfig(); err != nil {
+
+	err := v.ReadInConfig()
+	if err != nil {
 		return err
 	}
 	return v.Unmarshal(&Config)

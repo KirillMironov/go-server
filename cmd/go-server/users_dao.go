@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"encoding/hex"
 	_ "github.com/lib/pq"
-	"log"
 )
 
 type User struct {
@@ -33,14 +32,14 @@ func findUserByEmailAndPassword(email string, password string, db *sql.DB) (int6
 
 	rows, err := db.Query(sqlStr, email)
 	if err != nil {
-		log.Printf("%v", err)
+		return 0, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		err := rows.Scan(&user.Id, &user.Username, &user.Password, &user.Salt, &user.Email)
 		if err != nil {
-			log.Printf("%v", err)
+			return 0, err
 		}
 
 		hash := sha256.Sum256([]byte(password + user.Salt))

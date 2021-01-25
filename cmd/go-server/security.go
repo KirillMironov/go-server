@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"github.com/KirillMironov/go-server/cmd/go-server/config"
 	"github.com/dgrijalva/jwt-go"
-	"log"
 	"math/rand"
 	"time"
 )
@@ -43,23 +42,22 @@ func createToken(user *User) (string, error) {
 
 	tokenString, err := token.SignedString([]byte(config.Config.Security.JWTKey))
 	if err != nil {
-		log.Printf("Unable to create token")
 		return "", err
 	}
 
 	return tokenString, nil
 }
 
-func verifyToken(token string) (bool, int64) {
+func verifyToken(token string) (bool, int64, error) {
 	claims := &Claims{}
 
 	tkn, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(config.Config.Security.JWTKey), nil
 	})
 	if err != nil {
-		log.Printf("%v", err)
+		return false, 0, err
 	}
 
-	return tkn.Valid, claims.Id
+	return tkn.Valid, claims.Id, nil
 }
 

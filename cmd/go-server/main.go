@@ -12,20 +12,20 @@ import (
 func insertInTx(user *User) {
 	db, err := sql.Open("postgres", config.Config.Database.ConnectionString)
 	if err != nil {
-		log.Printf("%v", err)
+		log.Println(err)
 	}
 
 	tx, err := db.Begin()
 	if err != nil || tx == nil {
-		log.Printf("%v", err)
+		log.Println(err)
 	}
 
 	user.Id, err = insertUser(user, tx)
 	if err != nil {
-		log.Printf("%v", err)
+		log.Println(err)
 		err = tx.Rollback()
 	} else {
-		log.Printf("User inserted")
+		log.Println("User inserted")
 		err = tx.Commit()
 	}
 }
@@ -33,7 +33,7 @@ func insertInTx(user *User) {
 func findUser(user *User) bool {
 	db, err := sql.Open("postgres", config.Config.Database.ConnectionString)
 	if err != nil {
-		log.Printf("%v", err)
+		log.Println(err)
 	}
 
 	user.Id, err = findUserByEmailAndPassword(user.Email, user.Password, db)
@@ -61,12 +61,15 @@ func auth(w http.ResponseWriter, r *http.Request) {
 
 	token, err := r.Cookie("jwt")
 	if err != nil {
-		log.Printf("%v", err)
+		log.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	isValid, _ := verifyToken(token.Value)
+	isValid, _, err := verifyToken(token.Value)
+	if err != nil {
+		log.Println(err)
+	}
 
 	if !isValid {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -94,9 +97,9 @@ func signIn(w http.ResponseWriter, r *http.Request) {
 	user := User{0, email, password, "", email}
 	if findUser(&user) {
 		setTokenInCookies(&user, w)
-		log.Printf("Success sign in")
+		log.Println("Success sign in")
 	} else {
-		log.Printf("Wrong email or password")
+		log.Println("Wrong email or password")
 		w.WriteHeader(http.StatusNoContent)
 	}
 }
@@ -107,15 +110,18 @@ func home(w http.ResponseWriter, r *http.Request)  {
 
 	token, err := r.Cookie("jwt")
 	if err != nil {
-		log.Printf("%v", err)
+		log.Println(err)
 	}
 
-	isValid, id := verifyToken(token.Value)
+	isValid, id, err := verifyToken(token.Value)
+	if err != nil {
+		log.Println(err)
+	}
 
 	if isValid {
 		_, err = fmt.Fprintf(w, "%v", id)
 		if err != nil {
-			log.Printf("%v", err)
+			log.Println(err)
 		}
 	}
 }
@@ -123,10 +129,10 @@ func home(w http.ResponseWriter, r *http.Request)  {
 func main() {
 	err := config.ReadConfig()
 	if err != nil {
-		log.Printf("%v", err)
+		log.Println(err)
 	}
 
-	log.Printf("Started")
+	log.Println("Started")
 
 	http.Handle("/", http.FileServer(http.Dir("../../../www/")))
 	http.HandleFunc("/auth/", auth)

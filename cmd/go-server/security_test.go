@@ -1,11 +1,13 @@
 package main
 
 import (
+	"github.com/KirillMironov/go-server/cmd/go-server/config"
 	"testing"
 )
 
 func TestCreateToken(t *testing.T) {
 	user := &User{0, "Homer", "666", "", "homer@gmail.com"}
+	config.Config.Security.JWTKey = jwtKey
 
 	token, err := createToken(user)
 	if err != nil || len(token) == 0 {
@@ -15,20 +17,20 @@ func TestCreateToken(t *testing.T) {
 
 func TestVerifyToken(t *testing.T) {
 	user := &User{26, "Marge", "256", "", "marge@gmail.com"}
+	config.Config.Security.JWTKey = jwtKey
 
 	token, err := createToken(user)
 	if err != nil || len(token) == 0 {
 		t.Fatal("Unable to create token")
 	}
 
-	isValid, id := verifyToken(token)
-	if isValid == false || id != user.Id {
+	isValid, id, err := verifyToken(token)
+	if isValid == false || id != user.Id || err != nil {
 		t.Fatal("Token validation error")
 	}
 
-	wrongToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VybmFtZSI6IkhvbWVyIiwiSWQiOjAsImV4cCI6MTYxMTMzNDMyNX0.2aFT3DJVekoGONKHI1S-Ga0aKXqs_zTCrS54fsyutZQ"
-	isValid, id = verifyToken(wrongToken)
-	if isValid == true {
+	isValid, _, err = verifyToken(invalidToken)
+	if isValid == true || err == nil {
 		t.Fatal("Token validation error")
 	}
 }
