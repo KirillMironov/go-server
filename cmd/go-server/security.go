@@ -29,7 +29,7 @@ func generateHashAndSalt(password string) (string, string) {
 	return hex.EncodeToString(hash[:]), string(salt)
 }
 
-func createToken(user *User) (string, error) {
+func createToken(user *UserData) (string, error) {
 	claims := &Claims{
 		Username: user.Username,
 		Id: user.Id,

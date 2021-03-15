@@ -1,17 +1,118 @@
+DROP TABLE IF EXISTS pictures;
+DROP TABLE IF EXISTS order_items;
+DROP TABLE IF EXISTS items;
+DROP TABLE IF EXISTS item_statuses;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS order_statuses;
+DROP TABLE IF EXISTS addresses;
+DROP TABLE IF EXISTS countries;
+DROP TABLE IF EXISTS credit_cards;
+DROP TABLE IF EXISTS credit_card_statuses;
 DROP TABLE IF EXISTS users;
 
 CREATE TABLE users
 (
-	id SERIAL PRIMARY KEY,
-	username character varying (16),
-	password character varying (64),
-	salt character varying (8),
-	email character varying (128),
-	CONSTRAINT users_username_unq UNIQUE (username)
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(16),
+    email VARCHAR(128),
+    password VARCHAR(64),
+    salt VARCHAR(100),
+    first_name VARCHAR(128),
+    last_name VARCHAR(128),
+    role VARCHAR(32),
+    created_at TIMESTAMP,
+    CONSTRAINT users_username_unq UNIQUE (username),
+    CONSTRAINT users_email_unq UNIQUE (email)
 );
 
-INSERT INTO users (username, password, email) VALUES ('Bart', '123', 'asf@gmail.com');
+CREATE TABLE countries
+(
+    country_code2 VARCHAR(2) PRIMARY KEY,
+    country VARCHAR(64),
+    CONSTRAINT countries_country_unq UNIQUE (country)
+);
 
-SELECT EXISTS(SELECT * FROM users WHERE email = $1 AND password = $2)
+CREATE TABLE addresses
+(
+    id SERIAL PRIMARY KEY,
+    user_id SERIAL REFERENCES users(id),
+    country_code2 VARCHAR(2) REFERENCES countries(country_code2),
+    address_line_1 VARCHAR(128),
+    address_line_2 VARCHAR(128),
+    city VARCHAR(64),
+    region VARCHAR(64),
+    zip VARCHAR(32)
+);
 
-SELECT * FROM users;
+CREATE TABLE credit_card_statuses
+(
+    id INTEGER PRIMARY KEY,
+    status VARCHAR(64),
+    CONSTRAINT credit_card_statuses_status_unq UNIQUE (status)
+);
+
+CREATE TABLE credit_cards
+(
+    id SERIAL PRIMARY KEY,
+    user_id SERIAL REFERENCES users(id),
+    card_number VARCHAR(32),
+    name_on_card VARCHAR(64),
+    expires_on DATE,
+    cvv VARCHAR(8),
+    status_id INTEGER REFERENCES credit_card_statuses(id),
+    CONSTRAINT credit_cards_card_unq UNIQUE (card_number, expires_on)
+);
+
+CREATE TABLE order_statuses
+(
+    id INTEGER PRIMARY KEY,
+    status VARCHAR(64),
+    CONSTRAINT order_statuses_status_unq UNIQUE (status)
+);
+
+CREATE TABLE orders
+(
+    id SERIAL PRIMARY KEY,
+    user_id SERIAL REFERENCES users(id),
+    payment_method_id SERIAL REFERENCES credit_cards(id),
+    shipping_address_id SERIAL REFERENCES addresses(id),
+    status_id INTEGER REFERENCES order_statuses(id),
+    created_at TIMESTAMP
+);
+
+CREATE TABLE item_statuses
+(
+    id INTEGER PRIMARY KEY,
+    status VARCHAR(64),
+    CONSTRAINT item_statuses_status_unq UNIQUE (status)
+);
+
+CREATE TABLE items
+(
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(64),
+    description VARCHAR(2048),
+    price NUMERIC(16, 2),
+    attributes JSONB,
+    status_id INTEGER REFERENCES item_statuses(id),
+    created_at TIMESTAMP,
+    CONSTRAINT items_positive_price CHECK (price > 0)
+);
+
+CREATE TABLE order_items
+(
+    order_id SERIAL REFERENCES orders(id),
+    item_id SERIAL REFERENCES items(id),
+    quantity INTEGER,
+    CONSTRAINT order_items_positive_quantity CHECK (quantity > 0)
+);
+
+CREATE TABLE pictures
+(
+    id SERIAL PRIMARY KEY,
+    item_id INTEGER REFERENCES items(id),
+    picture BYTEA
+);
+
+INSERT INTO item_statuses (id, status) VALUES (1, 'In Stock');
+INSERT INTO item_statuses (id, status) VALUES (2, 'Out of Stock');
