@@ -343,7 +343,7 @@ func main() {
 
 	log.Println("Started")
 
-	http.Handle("/", http.FileServer(http.Dir("../../../www/")))
+	http.Handle("/", http.FileServer(http.Dir("../www/")))
 	http.HandleFunc("/auth/", auth)
 	http.HandleFunc("/register/", signUp)
 	http.HandleFunc("/login/", signIn)
