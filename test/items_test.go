@@ -1,13 +1,17 @@
-package main
+package test
 
 import (
 	"database/sql"
-	"github.com/KirillMironov/go-server/cmd/go-server/config"
+	"github.com/KirillMironov/go-server/config"
+	"github.com/KirillMironov/go-server/domain"
+	"github.com/KirillMironov/go-server/pkg/service"
 	"testing"
 	"time"
 )
 
-func TestInsertItem(t *testing.T) {
+var i = service.NewItemsUsecase()
+
+func TestCreateItem(t *testing.T) {
 	db, err := sql.Open("postgres", config.Config.Database.ConnectionString)
 	if err != nil {
 		t.Fatal(err)
@@ -19,10 +23,11 @@ func TestInsertItem(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	item := &Item{0, "4K HDMI Cable", "Connects Blu-ray players, Fire TV, Apple TV, PS4",
-		8.86, `{"Connector Type": "HDMI","Color": "Black","Brand": "Amazon Basics"}`, "[255, 104, 205]", 1, "", time.Now()}
+	item := &domain.Item{Title: "4K HDMI Cable", Description: "Connects Blu-ray players, Fire TV, Apple TV, PS4",
+		Price: 8.86, Attributes: `{"Connector Type": "HDMI","Color": "Black","Brand": "Amazon Basics"}`,
+		Picture: "[255, 104, 205]", StatusId: 1, CreatedAt: time.Now()}
 
-	_, err = insertItem(item, tx)
+	_, err = i.CreateItem(item, tx)
 	if err != nil {
 		t.Fatal("Unable to add item")
 	}
@@ -34,30 +39,30 @@ func TestInsertItem(t *testing.T) {
 	}
 }
 
-func TestFindItemById(t *testing.T) {
+func TestGetItemById(t *testing.T) {
 	db, err := sql.Open("postgres", config.Config.Database.ConnectionString)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = findItemById(4, db)
+	_, err = i.GetItemById(4, db)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = findItemById(-1, db)
+	_, err = i.GetItemById(-1, db)
 	if err == nil {
 		t.Fatal("Item was found using wrong id")
 	}
 }
 
-func TestFindItemsByTitleOrDescription(t *testing.T) {
+func TestGetItemsByTitleOrDescription(t *testing.T) {
 	db, err := sql.Open("postgres", config.Config.Database.ConnectionString)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = findItemsByTitleOrDescription("Fire", db)
+	_, err = i.GetItemsByTitleOrDescription("Fire", db)
 	if err != nil {
 		t.Fatal("Unable to find item")
 	}

@@ -15,4 +15,4 @@
 .idea
 .txt
 
-config/*
+config/service.yaml
