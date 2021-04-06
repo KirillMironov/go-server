@@ -78,10 +78,10 @@ func (u UsersUsecase) GetUserByEmailAndPassword(user *domain.User, db *sql.DB) e
 	return sql.ErrNoRows
 }
 
-func (u UsersUsecase) UpdateUsername(username string, user *domain.User, tx *sql.Tx) error {
+func (u UsersUsecase) UpdateUsername(newUsername string, id int64, tx *sql.Tx) error {
 	sqlStr := "UPDATE users SET username = $1 WHERE id = $2"
 
-	_, err := tx.Exec(sqlStr, username, user.Id)
+	_, err := tx.Exec(sqlStr, newUsername, id)
 	if err != nil {
 		return err
 	}

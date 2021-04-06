@@ -3,12 +3,13 @@ package handler
 import "net/http"
 
 func InitRoutes() {
-	http.HandleFunc("/auth", auth)
-	http.HandleFunc("/register", signUp)
+	http.HandleFunc("/join", signUp)
 	http.HandleFunc("/login", signIn)
-	http.HandleFunc("/logout", logout)
-	http.HandleFunc("/changeUsername", changeUsername)
-	http.HandleFunc("/addItem", addItem)
-	http.HandleFunc("/findItems", findItems)
-	http.HandleFunc("/uploadPicture", uploadPicture)
+	http.Handle("/auth", NewEnsureAuth(nil))
+	http.Handle("/getUserData", NewEnsureAuth(getUserData))
+	http.Handle("/logout", NewEnsureAuth(logout))
+	http.Handle("/changeUsername", NewEnsureAuth(changeUsername))
+	http.Handle("/addItem", NewEnsureAuth(addItem))
+	http.Handle("/search", NewEnsureAuth(findItems))
+	http.Handle("/uploadPicture", NewEnsureAuth(uploadPicture))
 }

@@ -7,9 +7,7 @@ import (
 	"github.com/KirillMironov/go-server/pkg/service"
 )
 
-var (
-	p = service.NewPicturesUsecase()
-)
+var p = service.NewPicturesUsecase()
 
 func UploadPicture(picture *domain.Picture) error {
 	db, err := sql.Open("postgres", config.Config.Database.ConnectionString)

@@ -9,7 +9,7 @@ type UsersRepository interface {
 	CreateUser(user *domain.User, tx *sql.Tx) (int64, error)
 	GetUserById(user *domain.User, db *sql.DB) error
 	GetUserByEmailAndPassword(user *domain.User, db *sql.DB) error
-	UpdateUsername(username string, user *domain.User, tx *sql.Tx) error
+	UpdateUsername(newUsername string, id int64, tx *sql.Tx) error
 }
 
 type ItemsRepository interface {

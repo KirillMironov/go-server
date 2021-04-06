@@ -7,9 +7,7 @@ import (
 	"time"
 )
 
-var (
-	s = service.NewSecurityUsecase()
-)
+var s = service.NewSecurityUsecase()
 
 func GenerateHashedPasswordAndSalt(password string) (string, string) {
 	return s.GenerateHashedPasswordAndSalt(password)

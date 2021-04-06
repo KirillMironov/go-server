@@ -43,26 +43,6 @@ func TestCreateUser(t *testing.T) {
 	}
 }
 
-func TestGetUserById(t *testing.T) {
-	db, err := sql.Open("postgres", config.Config.Database.ConnectionString)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	user := &domain.User{Id: 1}
-	user2 := &domain.User{Id: -1}
-
-	err = u.GetUserById(user,  db)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = u.GetUserById(user2,  db)
-	if err == nil {
-		t.Fatal("User was found using wrong id")
-	}
-}
-
 func TestGetUserByEmailAndPassword(t *testing.T) {
 	db, err := sql.Open("postgres", config.Config.Database.ConnectionString)
 	if err != nil {
@@ -95,9 +75,7 @@ func TestUpdateUsername(t *testing.T)  {
 		t.Fatal(err)
 	}
 
-	user := &domain.User{Id: 1}
-
-	err = u.UpdateUsername("Maggie", user, tx)
+	err = u.UpdateUsername("Maggie", 1, tx)
 	if err != nil {
 		t.Fatal("Unable to change Username")
 	}

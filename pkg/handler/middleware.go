@@ -1,0 +1,44 @@
+package handler
+
+import (
+	"context"
+	"github.com/KirillMironov/go-server/pkg/usecase"
+	"log"
+	"net/http"
+)
+
+type AuthenticatedHandler func(http.ResponseWriter, *http.Request)
+
+type EnsureAuth  struct {
+	handler AuthenticatedHandler
+}
+
+func NewEnsureAuth(handlerToWrap AuthenticatedHandler) *EnsureAuth {
+	return &EnsureAuth{handlerToWrap}
+}
+
+func (rh *EnsureAuth) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	token, err := usecase.GetTokenFromCookies("jwt", r)
+	if err != nil {
+		log.Println("JWT token not found. Unauthorized")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	id, err := usecase.VerifyAuthToken(token)
+	if err != nil {
+		log.Println("JWT token is not valid / expired. Unauthorized")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	// Create a new request context containing the authenticated user id
+	ctxWithId := context.WithValue(r.Context(), "userId", id)
+	// Create a new request using that new context
+	rWithId:= r.WithContext(ctxWithId)
+	// Call the real handler, passing the new request
+	rh.handler(w, rWithId)
+}

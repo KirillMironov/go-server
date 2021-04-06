@@ -7,9 +7,7 @@ import (
 	"github.com/KirillMironov/go-server/pkg/service"
 )
 
-var (
-	i = service.NewItemsUsecase()
-)
+var i = service.NewItemsUsecase()
 
 func CreateItem(item *domain.Item) (int64, error) {
 	db, err := sql.Open("postgres", config.Config.Database.ConnectionString)

@@ -15,15 +15,20 @@ func uploadPicture(w http.ResponseWriter, r *http.Request)  {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Println(err)
+		w.WriteHeader(http.StatusUnsupportedMediaType)
+		return
 	}
 
 	err = json.Unmarshal(body, &picture)
 	if err != nil {
 		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	err = usecase.UploadPicture(picture)
 	if err != nil {
 		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
 	}
 }

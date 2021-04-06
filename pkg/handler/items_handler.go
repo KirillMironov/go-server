@@ -22,38 +22,46 @@ func addItem(w http.ResponseWriter, r *http.Request)  {
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusRequestEntityTooLarge)
+		return
 	}
 
 	js, err := json.Marshal(id)
 	if err != nil {
 		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	_, err = w.Write(js)
 	if err != nil {
 		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	log.Println("Item added")
 }
 
 func findItems(w http.ResponseWriter, r *http.Request)  {
-	q := r.URL.Query().Get("q")
+	query := r.URL.Query().Get("q")
 
-	items, err := usecase.GetItemsByTitleOrDescription(q)
+	items, err := usecase.GetItemsByTitleOrDescription(query)
 	if err != nil {
 		log.Println(err)
+		w.WriteHeader(http.StatusRequestEntityTooLarge)
+		return
 	}
 
 	js, err := json.Marshal(items)
 	if err != nil {
 		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	_, err = w.Write(js)
 	if err != nil {
 		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
-
-

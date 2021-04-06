@@ -1,30 +1,12 @@
 package handler
 
 import (
+	"encoding/json"
 	"github.com/KirillMironov/go-server/domain"
 	"github.com/KirillMironov/go-server/pkg/usecase"
 	"log"
 	"net/http"
 )
-
-func auth(w http.ResponseWriter, r *http.Request) {
-	token, err := usecase.GetTokenFromCookies("jwt", r)
-	if err != nil {
-		log.Println("JWT token not found. Unauthorized")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	id, err := usecase.VerifyAuthToken(token)
-	if err != nil {
-		log.Println("JWT token is not valid / expired. Unauthorized")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	// TODO How to use this Id?
-	log.Println(id)
-}
 
 func signUp(w http.ResponseWriter, r *http.Request) {
 	email := r.URL.Query().Get("email")
@@ -36,23 +18,23 @@ func signUp(w http.ResponseWriter, r *http.Request) {
 
 	id, err := usecase.CreateUser(user)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
 		log.Println(err)
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	user.Id = id
 
 	token, err := usecase.GenerateAuthToken(user)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
 		log.Println(err)
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	err = usecase.SetTokenInCookies("jwt", token, w)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
 		log.Println(err)
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
@@ -71,21 +53,21 @@ func signIn(w http.ResponseWriter, r *http.Request) {
 	err := usecase.GetUserByEmailAndPassword(&user)
 	if err != nil {
 		log.Println("Wrong email/password")
-		w.WriteHeader(http.StatusNoContent)
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	token, err := usecase.GenerateAuthToken(&user)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
 		log.Println(err)
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	err = usecase.SetTokenInCookies("jwt", token, w)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
 		log.Println(err)
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
@@ -96,12 +78,41 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	usecase.RemoveTokenFromCookies("jwt", w)
 }
 
-func changeUsername(w http.ResponseWriter, r *http.Request) {
-	username := r.URL.Query().Get("username")
+func getUserData(w http.ResponseWriter, r *http.Request) {
+	id := r.Context().Value("userId").(int64)
 
-	// TODO How to get User data for UpdateUsername function?
-	err := usecase.UpdateUsername(username, &domain.User{Id: 1})
+	user := domain.User{
+		Id: id,
+	}
+
+	err := usecase.GetUserById(&user)
 	if err != nil {
 		log.Println(err)
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+
+	userData, err := json.Marshal(user)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	_, err = w.Write(userData)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+}
+
+func changeUsername(w http.ResponseWriter, r *http.Request) {
+	newUsername := r.URL.Query().Get("username")
+	id := r.Context().Value("userId").(int64)
+
+	err := usecase.UpdateUsername(newUsername, id)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
 	}
 }

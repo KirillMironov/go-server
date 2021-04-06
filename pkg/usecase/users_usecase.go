@@ -8,9 +8,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var (
-	u = service.NewUsersUsecase()
-)
+var u = service.NewUsersUsecase()
 
 func CreateUser(user *domain.User) (int64, error) {
 	db, err := sql.Open("postgres", config.Config.Database.ConnectionString)
@@ -33,20 +31,6 @@ func CreateUser(user *domain.User) (int64, error) {
 	return id, nil
 }
 
-func GetUserByEmailAndPassword(user *domain.User) error {
-	db, err := sql.Open("postgres", config.Config.Database.ConnectionString)
-	if err != nil {
-		return err
-	}
-
-	err = u.GetUserByEmailAndPassword(user, db)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func GetUserById(user *domain.User) error {
 	db, err := sql.Open("postgres", config.Config.Database.ConnectionString)
 	if err != nil {
@@ -61,7 +45,21 @@ func GetUserById(user *domain.User) error {
 	return nil
 }
 
-func UpdateUsername(username string, user *domain.User) error {
+func GetUserByEmailAndPassword(user *domain.User) error {
+	db, err := sql.Open("postgres", config.Config.Database.ConnectionString)
+	if err != nil {
+		return err
+	}
+
+	err = u.GetUserByEmailAndPassword(user, db)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func UpdateUsername(newUsername string, id int64) error {
 	db, err := sql.Open("postgres", config.Config.Database.ConnectionString)
 	if err != nil {
 		return err
@@ -72,7 +70,7 @@ func UpdateUsername(username string, user *domain.User) error {
 		return err
 	}
 
-	err = u.UpdateUsername(username, user, tx)
+	err = u.UpdateUsername(newUsername, id, tx)
 	if err != nil {
 		_ = tx.Rollback()
 		return err
