@@ -21,21 +21,22 @@ func VerifyAuthToken(token string) (int64, error) {
 	return s.VerifyAuthToken(token)
 }
 
-func SetTokenInCookies(cookieName string, token string, w http.ResponseWriter) error {
+func SetTokenInCookies(token string, w http.ResponseWriter) error {
 	cookie := http.Cookie{
-		Name: cookieName,
+		Name: "jwt",
 		Value: token,
 		Path: "/",
-		HttpOnly: true,
 		Expires: time.Now().Add(24 * time.Hour),
+		Secure: true,
+		HttpOnly: true,
 	}
 	http.SetCookie(w, &cookie)
 
 	return nil
 }
 
-func GetTokenFromCookies(cookieName string, r *http.Request) (string, error) {
-	token, err := r.Cookie(cookieName)
+func GetTokenFromCookies(r *http.Request) (string, error) {
+	token, err := r.Cookie("jwt")
 	if err != nil {
 		return "", err
 	}
@@ -43,9 +44,9 @@ func GetTokenFromCookies(cookieName string, r *http.Request) (string, error) {
 	return token.Value, nil
 }
 
-func RemoveTokenFromCookies(cookieName string, w http.ResponseWriter) {
+func RemoveTokenFromCookies(w http.ResponseWriter) {
 	cookie := http.Cookie{
-		Name: cookieName,
+		Name: "jwt",
 		Path: "/",
 		MaxAge: -1,
 	}

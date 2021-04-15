@@ -31,7 +31,7 @@ func signUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = usecase.SetTokenInCookies("jwt", token, w)
+	err = usecase.SetTokenInCookies(token, w)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
@@ -64,7 +64,7 @@ func signIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = usecase.SetTokenInCookies("jwt", token, w)
+	err = usecase.SetTokenInCookies(token, w)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
@@ -75,7 +75,7 @@ func signIn(w http.ResponseWriter, r *http.Request) {
 }
 
 func logout(w http.ResponseWriter, r *http.Request) {
-	usecase.RemoveTokenFromCookies("jwt", w)
+	usecase.RemoveTokenFromCookies(w)
 }
 
 func getUserData(w http.ResponseWriter, r *http.Request) {

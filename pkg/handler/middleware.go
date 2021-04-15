@@ -18,7 +18,7 @@ func NewEnsureAuth(handlerToWrap AuthenticatedHandler) *EnsureAuth {
 }
 
 func (rh *EnsureAuth) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	token, err := usecase.GetTokenFromCookies("jwt", r)
+	token, err := usecase.GetTokenFromCookies(r)
 	if err != nil {
 		log.Println("JWT token not found. Unauthorized")
 		w.WriteHeader(http.StatusUnauthorized)
@@ -31,9 +31,6 @@ func (rh *EnsureAuth) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	// Create a new request context containing the authenticated user id
 	ctxWithId := context.WithValue(r.Context(), "userId", id)

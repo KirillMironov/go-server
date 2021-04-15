@@ -3,6 +3,7 @@ package handler
 import "net/http"
 
 func InitRoutes() {
+	http.Handle("/", http.FileServer(http.Dir("../www/")))
 	http.HandleFunc("/join", signUp)
 	http.HandleFunc("/login", signIn)
 	http.Handle("/auth", NewEnsureAuth(nil))
