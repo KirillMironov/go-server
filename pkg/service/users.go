@@ -71,6 +71,10 @@ func (u UsersUsecase) GetUserByEmailAndPassword(user *domain.User, db *sql.DB) e
 
 		if tempUser.Password == hex.EncodeToString(hash[:]) {
 			rows.Close()
+			user.Id = tempUser.Id
+			user.Username = tempUser.Username
+			user.Role = tempUser.Role
+			user.Password = ""
 			return nil
 		}
 	}
