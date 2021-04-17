@@ -4,14 +4,24 @@ import (
 	"encoding/json"
 	"github.com/KirillMironov/go-server/domain"
 	"github.com/KirillMironov/go-server/pkg/usecase"
+	"io/ioutil"
 	"log"
 	"net/http"
 )
 
 func signUp(w http.ResponseWriter, r *http.Request) {
-	email := r.URL.Query().Get("email")
-	password := r.URL.Query().Get("password")
-	username := r.URL.Query().Get("username")
+	body, _ := ioutil.ReadAll(r.Body)
+	keyVal := make(map[string]string)
+	err := json.Unmarshal(body, &keyVal)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	email := keyVal["email"]
+	password := keyVal["password"]
+	username := keyVal["username"]
 
 	password, salt := usecase.GenerateHashedPasswordAndSalt(password)
 	user := &domain.User{Username: username, Email: email, Password: password, Salt: salt}
@@ -42,15 +52,24 @@ func signUp(w http.ResponseWriter, r *http.Request) {
 }
 
 func signIn(w http.ResponseWriter, r *http.Request) {
-	email := r.URL.Query().Get("email")
-	password := r.URL.Query().Get("password")
+	body, _ := ioutil.ReadAll(r.Body)
+	keyVal := make(map[string]string)
+	err := json.Unmarshal(body, &keyVal)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	email := keyVal["email"]
+	password := keyVal["password"]
 
 	user := domain.User{
 		Email:    email,
 		Password: password,
 	}
 
-	err := usecase.GetUserByEmailAndPassword(&user)
+	err = usecase.GetUserByEmailAndPassword(&user)
 	if err != nil {
 		log.Println("Wrong email/password")
 		w.WriteHeader(http.StatusUnauthorized)
