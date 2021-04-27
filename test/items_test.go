@@ -45,7 +45,7 @@ func TestGetItemById(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = i.GetItemById(4, db)
+	_, err = i.GetItemById(1, db)
 	if err != nil {
 		t.Fatal(err)
 	}
