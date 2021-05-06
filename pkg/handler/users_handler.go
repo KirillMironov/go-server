@@ -45,33 +45,39 @@ func signUp(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	js, err := json.Marshal(map[string]string{"token": token})
-	_, err = w.Write(js)
+	err = json.NewEncoder(w).Encode(map[string]string{"token": token})
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
+
+	//js, err := json.Marshal(map[string]string{"token": token})
+	//_, err = w.Write(js)
+	//if err != nil {
+	//	log.Println(err)
+	//	w.WriteHeader(http.StatusUnauthorized)
+	//	return
+	//}
 
 	log.Println("User created")
 }
 
 func signIn(w http.ResponseWriter, r *http.Request) {
-	body, _ := ioutil.ReadAll(r.Body)
-	keyVal := make(map[string]string)
-	err := json.Unmarshal(body, &keyVal)
+	var user domain.User
+
+	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	email := keyVal["email"]
-	password := keyVal["password"]
-
-	user := domain.User{
-		Email:    email,
-		Password: password,
+	err = json.Unmarshal(body, &user)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
 	}
 
 	err = usecase.GetUserByEmailAndPassword(&user)
@@ -90,13 +96,20 @@ func signIn(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	js, err := json.Marshal(map[string]string{"token": token})
-	_, err = w.Write(js)
+	err = json.NewEncoder(w).Encode(map[string]string{"token": token})
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
+
+	//js, err := json.Marshal(map[string]string{"token": token})
+	//_, err = w.Write(js)
+	//if err != nil {
+	//	log.Println(err)
+	//	w.WriteHeader(http.StatusUnauthorized)
+	//	return
+	//}
 
 	log.Println("Successful login")
 }
