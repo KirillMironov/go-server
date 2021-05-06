@@ -10,29 +10,31 @@ import (
 )
 
 func signUp(w http.ResponseWriter, r *http.Request) {
-	body, _ := ioutil.ReadAll(r.Body)
-	keyVal := make(map[string]string)
-	err := json.Unmarshal(body, &keyVal)
+	var credentials domain.User
+
+	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	email := keyVal["email"]
-	password := keyVal["password"]
-	username := keyVal["username"]
-
-	password, salt := usecase.GenerateHashedPasswordAndSalt(password)
-	user := &domain.User{Username: username, Email: email, Password: password, Salt: salt}
-
-	id, err := usecase.CreateUser(user)
+	err = json.Unmarshal(body, &credentials)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	user.Id = id
+
+	password, salt := usecase.GenerateHashedPasswordAndSalt(credentials.Password)
+	user := &domain.User{Username: credentials.Username, Email: credentials.Email, Password: password, Salt: salt}
+
+	user.Id, err = usecase.CreateUser(user)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
 
 	token, err := usecase.GenerateAuthToken(user)
 	if err != nil {
@@ -41,7 +43,7 @@ func signUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = usecase.SetTokenInCookies(token, w)
+	err = json.NewEncoder(w).Encode("`{token:"+token+"}`")
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
@@ -83,7 +85,7 @@ func signIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = usecase.SetTokenInCookies(token, w)
+	err = json.NewEncoder(w).Encode("`{token:"+token+"}`")
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
