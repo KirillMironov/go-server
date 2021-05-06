@@ -36,16 +36,16 @@ func signUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//token, err := usecase.GenerateAuthToken(user)
-	//if err != nil {
-	//	log.Println(err)
-	//	w.WriteHeader(http.StatusUnauthorized)
-	//	return
-	//}
+	token, err := usecase.GenerateAuthToken(user)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 
-	js, err := json.Marshal(user)
+	js, err := json.Marshal(map[string]string{"token": token})
 	_, err = w.Write(js)
 	if err != nil {
 		log.Println(err)
@@ -81,16 +81,16 @@ func signIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//token, err := usecase.GenerateAuthToken(&user)
-	//if err != nil {
-	//	log.Println(err)
-	//	w.WriteHeader(http.StatusUnauthorized)
-	//	return
-	//}
+	token, err := usecase.GenerateAuthToken(&user)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 
-	js, err := json.Marshal(user)
+	js, err := json.Marshal(map[string]string{"token": token})
 	_, err = w.Write(js)
 	if err != nil {
 		log.Println(err)
