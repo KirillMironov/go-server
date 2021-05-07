@@ -7,5 +7,6 @@ type Config struct {
 	}
 	Security struct {
 		JWTKey string
+		AllowedOrigin string
 	}
 }
