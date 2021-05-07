@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"github.com/KirillMironov/go-server/config"
 	"github.com/KirillMironov/go-server/pkg/usecase"
 	"log"
 	"net/http"
@@ -19,7 +18,7 @@ func NewEnsureAuth(handlerToWrap AuthenticatedHandler) *EnsureAuth {
 }
 
 func (rh *EnsureAuth) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", config.Config.Security.AllowedOrigin)
+	w.Header().Set("Access-Control-Allow-Origin", r.Host)
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 
 	token, err := usecase.GetTokenFromCookies(r)
