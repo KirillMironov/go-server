@@ -10,6 +10,9 @@ import (
 )
 
 func signUp(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+
 	var credentials domain.User
 
 	body, err := ioutil.ReadAll(r.Body)
@@ -54,6 +57,9 @@ func signUp(w http.ResponseWriter, r *http.Request) {
 }
 
 func signIn(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	
 	var user domain.User
 
 	body, err := ioutil.ReadAll(r.Body)
