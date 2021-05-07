@@ -18,10 +18,6 @@ func NewEnsureAuth(handlerToWrap AuthenticatedHandler) *EnsureAuth {
 }
 
 func (rh *EnsureAuth) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Access-Control-Allow-Origin", "https://flutter-web-app.ml")
-	w.Header().Add("Access-Control-Allow-Credentials", "true")
-	w.Header().Add("Content-Type", "application/json")
-
 	token, err := usecase.GetTokenFromCookies(r)
 	if err != nil {
 		log.Println("JWT token not found. Unauthorized")

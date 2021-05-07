@@ -43,6 +43,8 @@ func signUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Add("Content-Type", "application/json")
+
 	err = json.NewEncoder(w).Encode(map[string]string{"token": token})
 	if err != nil {
 		log.Println(err)
@@ -83,6 +85,8 @@ func signIn(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
+
+	w.Header().Add("Content-Type", "application/json")
 
 	err = json.NewEncoder(w).Encode(map[string]string{"token": token})
 	if err != nil {
