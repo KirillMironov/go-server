@@ -25,6 +25,7 @@ func (rh *EnsureAuth) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 
 	token, err := usecase.GetTokenFromHeader(r)
+	log.Println(token)
 	if err != nil {
 		log.Println("JWT token not found. Unauthorized")
 		w.WriteHeader(http.StatusUnauthorized)
