@@ -10,6 +10,11 @@ import (
 )
 
 func signUp(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Access-Control-Allow-Origin", "https://flutter-web-app.ml")
+	w.Header().Add("Access-Control-Allow-Methods", "POST")
+	w.Header().Add("Access-Control-Allow-Methods", "OPTION")
+	w.Header().Add("Content-Type", "application/json")
+
 	var credentials domain.User
 
 	body, err := ioutil.ReadAll(r.Body)
@@ -54,6 +59,11 @@ func signUp(w http.ResponseWriter, r *http.Request) {
 }
 
 func signIn(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Access-Control-Allow-Origin", "https://flutter-web-app.ml")
+	w.Header().Add("Access-Control-Allow-Methods", "POST")
+	w.Header().Add("Access-Control-Allow-Methods", "OPTION")
+	w.Header().Add("Content-Type", "application/json")
+
 	var user domain.User
 
 	body, err := ioutil.ReadAll(r.Body)
