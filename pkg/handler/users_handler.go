@@ -10,6 +10,10 @@ import (
 )
 
 func signUp(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.Header().Set("Content-Type", "application/json")
+
 	var credentials domain.User
 
 	body, err := ioutil.ReadAll(r.Body)
@@ -43,8 +47,6 @@ func signUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-
 	err = json.NewEncoder(w).Encode(map[string]string{"token": token})
 	if err != nil {
 		log.Println(err)
@@ -56,6 +58,10 @@ func signUp(w http.ResponseWriter, r *http.Request) {
 }
 
 func signIn(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.Header().Set("Content-Type", "application/json")
+
 	var user domain.User
 
 	body, err := ioutil.ReadAll(r.Body)
@@ -85,8 +91,6 @@ func signIn(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-
-	w.Header().Set("Content-Type", "application/json")
 
 	err = json.NewEncoder(w).Encode(map[string]string{"token": token})
 	if err != nil {
