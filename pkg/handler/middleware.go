@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"github.com/KirillMironov/go-server/config"
 	"github.com/KirillMironov/go-server/pkg/usecase"
 	"log"
 	"net/http"
@@ -18,7 +19,7 @@ func NewEnsureAuth(handlerToWrap AuthenticatedHandler) *EnsureAuth {
 }
 
 func (rh *EnsureAuth) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	r.Header.Add("Access-Control-Allow-Origin", "*")
+	r.Header.Add("Access-Control-Allow-Origin", config.Config.Security.AllowedOrigin)
 	r.Header.Add("Access-Control-Allow-Methods", "POST")
 	r.Header.Add("Access-Control-Allow-Methods", "OPTION")
 	r.Header.Add("Content-Type", "application/json")
