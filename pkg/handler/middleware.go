@@ -18,6 +18,11 @@ func NewEnsureAuth(handlerToWrap AuthenticatedHandler) *EnsureAuth {
 }
 
 func (rh *EnsureAuth) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	r.Header.Add("Access-Control-Allow-Origin", "*")
+	r.Header.Add("Access-Control-Allow-Methods", "POST")
+	r.Header.Add("Access-Control-Allow-Methods", "OPTION")
+	r.Header.Add("Content-Type", "application/json")
+
 	token, err := usecase.GetTokenFromCookies(r)
 	if err != nil {
 		log.Println("JWT token not found. Unauthorized")
