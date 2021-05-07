@@ -10,7 +10,7 @@ import (
 )
 
 func signUp(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "https://flutter-web-app.ml/")
+	w.Header().Set("Access-Control-Allow-Origin", "https://flutter-web-app.ml")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 
 	var credentials domain.User
@@ -57,7 +57,7 @@ func signUp(w http.ResponseWriter, r *http.Request) {
 }
 
 func signIn(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "https://flutter-web-app.ml/")
+	w.Header().Set("Access-Control-Allow-Origin", "https://flutter-web-app.ml")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 
 	var user domain.User
