@@ -19,10 +19,10 @@ func NewEnsureAuth(handlerToWrap AuthenticatedHandler) *EnsureAuth {
 }
 
 func (rh *EnsureAuth) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	r.Header.Add("Access-Control-Allow-Origin", config.Config.Security.AllowedOrigin)
-	r.Header.Add("Access-Control-Allow-Methods", "POST")
-	r.Header.Add("Access-Control-Allow-Methods", "OPTION")
-	r.Header.Add("Content-Type", "application/json")
+	w.Header().Add("Access-Control-Allow-Origin", config.Config.Security.AllowedOrigin)
+	w.Header().Add("Access-Control-Allow-Methods", "POST")
+	w.Header().Add("Access-Control-Allow-Methods", "OPTION")
+	w.Header().Add("Content-Type", "application/json")
 
 	token, err := usecase.GetTokenFromCookies(r)
 	if err != nil {
