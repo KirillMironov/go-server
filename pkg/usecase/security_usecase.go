@@ -4,6 +4,7 @@ import (
 	"github.com/KirillMironov/go-server/domain"
 	"github.com/KirillMironov/go-server/pkg/service"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -42,6 +43,16 @@ func GetTokenFromCookies(r *http.Request) (string, error) {
 	}
 
 	return token.Value, nil
+}
+
+func GetTokenFromHeader(r *http.Request) (string, error) {
+	token := r.Header.Get("Authorization")
+	splitToken := strings.Split(token, "Bearer")
+	if len(splitToken) != 2 {
+		return "", http.ErrAbortHandler
+	}
+
+	return strings.TrimSpace(splitToken[1]), nil
 }
 
 func RemoveTokenFromCookies(w http.ResponseWriter) {
