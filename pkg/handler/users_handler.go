@@ -10,11 +10,6 @@ import (
 )
 
 func signUp(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "OPTIONS" {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
 	var credentials domain.User
 
 	body, err := ioutil.ReadAll(r.Body)
@@ -61,11 +56,6 @@ func signUp(w http.ResponseWriter, r *http.Request) {
 }
 
 func signIn(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "OPTIONS" {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
 	var user domain.User
 
 	body, err := ioutil.ReadAll(r.Body)
