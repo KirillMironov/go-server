@@ -18,6 +18,11 @@ func NewEnsureAuth(handlerToWrap AuthenticatedHandler) *EnsureAuth {
 }
 
 func (rh *EnsureAuth) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "OPTIONS" {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+	
 	token := usecase.GetTokenFromHeader(r)
 
 	id, err := usecase.VerifyAuthToken(token)
