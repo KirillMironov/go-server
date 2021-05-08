@@ -18,11 +18,6 @@ func NewEnsureAuth(handlerToWrap AuthenticatedHandler) *EnsureAuth {
 }
 
 func (rh *EnsureAuth) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, " +
-		"Accept-Encoding, X-CSRF-Token, Authorization")
-
 	token := usecase.GetTokenFromHeader(r)
 
 	id, err := usecase.VerifyAuthToken(token)
