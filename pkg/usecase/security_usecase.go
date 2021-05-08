@@ -47,8 +47,11 @@ func GetTokenFromCookies(r *http.Request) (string, error) {
 
 func GetTokenFromHeader(r *http.Request) string {
 	token := r.Header.Get("Authorization")
-	splitToken := strings.Split(token, "Bearer ")
+	if len(token) == 0 {
+		return ""
+	}
 
+	splitToken := strings.Split(token, "Bearer ")
 	return splitToken[1]
 }
 
