@@ -84,9 +84,8 @@ func (i ItemsUsecase) GetItemsByTitleOrDescription(query string, db *sql.DB) ([]
 			item.Picture = ""
 		}
 
-		rows.Close()
 		items = append(items, item)
 	}
 
-	return items, db.Close()
+	return items, nil
 }
