@@ -27,7 +27,16 @@ func CreateUser(user *domain.User) (int64, error) {
 		return 0, err
 	}
 
-	_ = tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		return 0, err
+	}
+
+	err = db.Close()
+	if err != nil {
+		return 0, err
+	}
+
 	return id, nil
 }
 
@@ -42,6 +51,11 @@ func GetUserById(user *domain.User) error {
 		return err
 	}
 
+	err = db.Close()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -52,6 +66,11 @@ func GetUserByEmailAndPassword(user *domain.User) error {
 	}
 
 	err = u.GetUserByEmailAndPassword(user, db)
+	if err != nil {
+		return err
+	}
+
+	err = db.Close()
 	if err != nil {
 		return err
 	}
@@ -76,6 +95,15 @@ func UpdateUsername(newUsername string, id int64) error {
 		return err
 	}
 
-	_ = tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+
+	err = db.Close()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

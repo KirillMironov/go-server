@@ -26,7 +26,16 @@ func CreateItem(item *domain.Item) (int64, error) {
 		return 0, err
 	}
 
-	_ = tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		return 0, err
+	}
+
+	err = db.Close()
+	if err != nil {
+		return 0, err
+	}
+
 	return id, err
 }
 
@@ -37,6 +46,11 @@ func GetItemsByTitleOrDescription(query string) ([]*domain.Item, error) {
 	}
 
 	items, err := i.GetItemsByTitleOrDescription(query, db)
+	if err != nil {
+		return nil, err
+	}
+
+	err = db.Close()
 	if err != nil {
 		return nil, err
 	}

@@ -26,6 +26,15 @@ func UploadPicture(picture *domain.Picture) error {
 		return err
 	}
 
-	_ = tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+
+	err = db.Close()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
