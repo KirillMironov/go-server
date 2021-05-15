@@ -1,12 +1,17 @@
-package main
+package test
 
 import (
 	"database/sql"
-	"github.com/KirillMironov/go-server/cmd/go-server/config"
+	"github.com/KirillMironov/go-server/config"
+	"github.com/KirillMironov/go-server/domain"
+	"github.com/KirillMironov/go-server/pkg/service"
+	_ "github.com/lib/pq"
 	"testing"
 )
 
-func TestInsertUser(t *testing.T) {
+var u = service.NewUsersUsecase()
+
+func TestCreateUser(t *testing.T) {
 	db, err := sql.Open("postgres", config.Config.Database.ConnectionString)
 	if err != nil {
 		t.Fatal(err)
@@ -18,15 +23,15 @@ func TestInsertUser(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	user := &User{0, "Flanders1", "flanders1@gmail.com", "666", ""}
-	user2 := &User{0, "Marge11", "marge11@gmail.com", "122", ""}
+	user := &domain.User{Username: "Flanders1", Email: "flanders1@gmail.com", Password: "666"}
+	user2 := &domain.User{Username: "Marge11", Email: "marge11@gmail.com", Password: "122"}
 
-	_, err = insertUser(user, tx)
+	_, err = u.CreateUser(user, tx)
 	if err != nil {
 		t.Fatal("Unable to insert user")
 	}
 
-	_, err = insertUser(user2, tx)
+	_, err = u.CreateUser(user2, tx)
 	if err != nil {
 		t.Fatal("Unable to insert user")
 	}
@@ -38,41 +43,27 @@ func TestInsertUser(t *testing.T) {
 	}
 }
 
-func TestFindUserByEmailAndPassword(t *testing.T) {
+func TestGetUserByEmailAndPassword(t *testing.T) {
 	db, err := sql.Open("postgres", config.Config.Database.ConnectionString)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = findUserByEmailAndPassword("bart@gmail.com", "123", db)
+	user := &domain.User{Email: "bart@gmail.com", Password: "123"}
+	user2 := &domain.User{Email: "Homer", Password: "Homer"}
+
+	err = u.GetUserByEmailAndPassword(user, db)
 	if err != nil {
 		t.Fatal("Unable to find user")
 	}
 
-	_, err = findUserByEmailAndPassword("Homer", "Homer", db)
+	err = u.GetUserByEmailAndPassword(user2, db)
 	if err == nil {
 		t.Fatal("User was found using wrong password")
 	}
 }
 
-func TestFindUserById(t *testing.T) {
-	db, err := sql.Open("postgres", config.Config.Database.ConnectionString)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = findUserById(1,  db)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = findUserById(-1,  db)
-	if err == nil {
-		t.Fatal("User was found using wrong id")
-	}
-}
-
-func TestChangeUsername(t *testing.T)  {
+func TestUpdateUsername(t *testing.T)  {
 	db, err := sql.Open("postgres", config.Config.Database.ConnectionString)
 	if err != nil {
 		t.Fatal(err)
@@ -84,9 +75,7 @@ func TestChangeUsername(t *testing.T)  {
 		t.Fatal(err)
 	}
 
-	currentUser.Id = 1
-
-	err = updateUsername("Maggie", tx)
+	err = u.UpdateUsername("Maggie", 1, tx)
 	if err != nil {
 		t.Fatal("Unable to change Username")
 	}

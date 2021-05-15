@@ -1,21 +1,33 @@
-package main
+package service
 
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"github.com/KirillMironov/go-server/cmd/go-server/config"
+	"github.com/KirillMironov/go-server/config"
+	"github.com/KirillMironov/go-server/domain"
+	"github.com/KirillMironov/go-server/pkg/repository"
 	"github.com/dgrijalva/jwt-go"
 	"math/rand"
 	"time"
 )
 
-type Claims struct {
+type AuthClaims struct {
 	Username string
 	Id int64
 	jwt.StandardClaims
 }
 
-func generateHashAndSalt(password string) (string, string) {
+type SecurityUsecase struct {
+	securityRepo    repository.SecurityRepository
+}
+
+func NewSecurityUsecase() repository.SecurityRepository {
+	return &SecurityUsecase{
+		securityRepo: repository.SecurityRepository(SecurityUsecase{}),
+	}
+}
+
+func (s SecurityUsecase) GenerateHashedPasswordAndSalt(password string) (string, string) {
 	letters := []byte("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 	rand.Seed(time.Now().UnixNano())
 
@@ -29,8 +41,8 @@ func generateHashAndSalt(password string) (string, string) {
 	return hex.EncodeToString(hash[:]), string(salt)
 }
 
-func createToken(user *UserData) (string, error) {
-	claims := &Claims{
+func (s SecurityUsecase) GenerateAuthToken(user *domain.User) (string, error) {
+	claims := &AuthClaims{
 		Username: user.Username,
 		Id: user.Id,
 		StandardClaims: jwt.StandardClaims{
@@ -48,16 +60,15 @@ func createToken(user *UserData) (string, error) {
 	return tokenString, nil
 }
 
-func verifyToken(token string) (bool, int64, error) {
-	claims := &Claims{}
+func (s SecurityUsecase) VerifyAuthToken(token string) (int64, error) {
+	claims := &AuthClaims{}
 
-	tkn, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(config.Config.Security.JWTKey), nil
 	})
 	if err != nil {
-		return false, 0, err
+		return 0, err
 	}
 
-	return tkn.Valid, claims.Id, nil
+	return claims.Id, nil
 }
-
